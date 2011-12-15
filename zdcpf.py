@@ -292,9 +292,9 @@ def runtimeseries(N,F,P,q,G,h,A,coop,lapse):
         lapse=Nodes[0].mismatch.shape[0]
     Nlinks=np.size(F,0)
     Nnodes=np.size(A,0)
-    start=time.time()
+    start=time()
     b=np.zeros(Nnodes)
-    b=cvxopt.matrix(b,tc='d')
+    b=matrix(b,tc='d')
     P_b=P[Nlinks+2:Nlinks+Nnodes+2,:]*1e6
     for t in range(lapse):
         for i in N:
@@ -325,11 +325,11 @@ def runtimeseries(N,F,P,q,G,h,A,coop,lapse):
         for k in N:                ########### Save balancing at each node
             k.balancing[t]=opt[2+Nlinks+k.id]
             k.curtailment[t]=opt[3+Nlinks+Nnodes+k.id]  
-        end=time.time()
+        end=time()
         if (np.mod(t,547)==0) and t>0:
             print "Elapsed time is ",round(end-start)," seconds. t = ",t," out of ",lapse
             sys.stdout.flush()
-    end=time.time()
+    end=time()
     #sys.stdout.flush()
     print "Calculation took ",round(end-start)," seconds."
     return N,F
@@ -343,11 +343,11 @@ def zdcpf(N,admat='admat.txt',incidence='incidence.txt',constraints='constraints
     Nnodes=np.size(K,0)-1
     Nlinks=np.size(K,1)-1
     F=np.zeros((Nlinks,lapse))
-    P=cvxopt.matrix(P,tc='d')
-    q=cvxopt.matrix(q,tc='d')
-    G=cvxopt.matrix(G,tc='d')
-    h=cvxopt.matrix(h,tc='d')
-    A=cvxopt.matrix(A,tc='d')
+    P=matrix(P,tc='d')
+    q=matrix(q,tc='d')
+    G=matrix(G,tc='d')
+    h=matrix(h,tc='d')
+    A=matrix(A,tc='d')
     N,F=runtimeseries(N,F,P,q,G,h,A,coop,lapse)
     return N,F, listFlows
 
