@@ -334,7 +334,22 @@ def runtimeseries(N,F,P,q,G,h,A,coop,lapse):
     print "Calculation took ",round(end-start)," seconds."
     return N,F
 
-
+def get_quant(quant=0.99,filename='results/copper_flows.npy')
+    f=np.load(filename)
+    flows=[]
+    for i in f:
+        flows.append(i*(i>0.))
+        flows.append(-i*(i<0.))
+    a=np.zeros(len(flows))
+    b=np.zeros(len(flows))
+    hs=np.zeros(len(flows))
+    for i in range(len(flows)):
+        a=hist(flows[i],cumulative=True,bins=100,normed=True)
+        for j in range(len(a[0])):
+            if (a[0][j]>=quant):
+                hs[i]=a[1][j]
+                break
+    return hs
 
 def zdcpf(N,admat='admat.txt',incidence='incidence.txt',constraints='constraints.txt',path='./settings/',coop=0,copper=0,lapse=None,b=1):
     if lapse == None:
