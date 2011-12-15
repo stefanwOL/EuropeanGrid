@@ -209,7 +209,7 @@ def get_colored_flow(flow, export, incidence_matrix='incidence.txt'):
     return array(FF), array(C)   
 
 def dcpowerflow(P,q,G,h,A,b):
-    sol=cvxopt.solvers.qp(P,q,G,h,A,b)
+    sol=solvers.qp(P,q,G,h,A,b)
     return sol['x']
 
 def AtoKh(N,pathadmat='./settings/admat.txt'):
