@@ -239,9 +239,12 @@ def AtoKh(N,pathadmat='./settings/admat.txt'):
                     L+=1
     return K,h, listFlows               
 
-def generatemat(N,admat,b=1,path='./settings/',copper=0):
+def generatemat(N,admat,b=None,path='./settings/',copper=0,h0=None):
     K,h, listFlows=AtoKh(N,path+admat)
-    for i in range(2*np.size(listFlows,0)): h[i]*=b
+    if h0 != None: 
+        h[2:88]=h0
+    if b != None:
+        for i in range(2*np.size(listFlows,0)): h[i]*=b
     Nnodes=np.size(K,0)
     Nlinks=np.size(K,1)
     # These numbers include the dummy node and link
@@ -334,7 +337,7 @@ def runtimeseries(N,F,P,q,G,h,A,coop,lapse):
     print "Calculation took ",round(end-start)," seconds."
     return N,F
 
-def get_quant(quant=0.99,filename='results/copper_flows.npy')
+def get_quant(quant=0.99,filename='results/copper_flows.npy'):
     f=np.load(filename)
     flows=[]
     for i in f:
@@ -351,10 +354,10 @@ def get_quant(quant=0.99,filename='results/copper_flows.npy')
                 break
     return hs
 
-def zdcpf(N,admat='admat.txt',incidence='incidence.txt',constraints='constraints.txt',path='./settings/',coop=0,copper=0,lapse=None,b=1):
+def zdcpf(N,admat='admat.txt',path='./settings/',coop=0,copper=0,lapse=None,b=None,h0=None):
     if lapse == None:
         lapse=N[0].nhours
-    P,q,G,h,A,K, listFlows = generatemat(N,admat,b,path,copper)
+    P,q,G,h,A,K, listFlows = generatemat(N,admat,b,path,copper,h0)
     Nnodes=np.size(K,0)-1
     Nlinks=np.size(K,1)-1
     F=np.zeros((Nlinks,lapse))
@@ -393,10 +396,22 @@ def zdcpf(N,admat='admat.txt',incidence='incidence.txt',constraints='constraints
 #    c=a/d
 #    tab[j,1]=c
 #    j+=1
-
-
-
-
-
+#N=Nodes()
+#K,H,lF=AtoKh(N)
+#h=H[2:88]
+#h0 = get_quant(.99)
+#print '99% Quantiles for European Connections'
+#print 'Link          Quant          Actual           Ratio'
+#for i in range(len(lF)):
+#	print lF[i][0] , '      ' , round(h0[2*i]) ,'     ' ,h[2*i] , '        ' , round(h[2*i]/h0[2*i],2)
+#	print '               ',round(h0[2*i+1])  ,'     ',h[2*i+1] ,'         ', round(h[2*i+1]/h0[2*i+1],2)
+#
+N=Nodes()
+quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,0.99,1.0]
+for q in quants:
+    h0 = get_quant(q)
+    N,F,lF=zdcpf(N,h0=h0)
+    N.save_nodes('Case_D_Quant_'+str(q))
+    save('./results/'+'Flows_Case_D_Quant'+str(q),F)
 
 
