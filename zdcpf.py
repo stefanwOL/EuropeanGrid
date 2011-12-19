@@ -370,19 +370,43 @@ def zdcpf(N,admat='admat.txt',path='./settings/',coop=0,copper=0,lapse=None,b=No
     return N,F, listFlows
 
 ##
-#N=Nodes()
-#betas=[1e-7,0.25,0.5,0.75,1.0,1.10,1.20,1.30,1.40,1.50,1.60,1.70,1.80,1.90,2.0,2.25,2.50,2.75,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,12.5,15.0,17.5,20.0,25.0,30.0]
-#betas=[20.0,25.0,30.0]
-#for b in betas:
-#    N,F,lF=zdcpf(N,b=b)
-#    N.save_nodes('Case_C_Beta_'+str(b))
-#    save('./results/'+'Flows_Case_C_Beta_'+str(b),F)
-#N=Nodes()
-#N,F,lF=zdcpf(N,copper=1)
-#N.save_nodes('copper')
-#save('./results/copper_flows',F)
-#
-##
+
+def Case_A(betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,0.99,1.0]):
+    N=Nodes()
+    h0=get_quant(.99)
+    for b in betas:
+        N,F,lF=zdcpf(N,b=b,h0=h0)
+        N.save_nodes('Case_A_Beta_'+str(b))
+        save('./results/'+'Flows_Case_A_Beta_'+str(b),F)
+
+def Case_B(links=np.arange(1000.0,30000.0,1000.0)):
+    N=Nodes()
+    hopt=get_quant(.99)
+    h0=get_quant(.99)
+    for l in links:
+        for h in range(len(hopt)):
+            h0[h]=l
+            if hopt[h]<l: h0[h]=hopt[h]
+        N,F,lF=zdcpf(N,h0=h0)
+        N.save_nodes('Case_B_Link_'+str(l))
+        save('./results/'+'Flows_Case_B_Link_'+str(l),F)
+
+def Case_C(betas=[1e-7,0.25,0.5,0.75,1.0,1.10,1.20,1.30,1.40,1.50,1.60,1.70,1.80,1.90,2.0,2.25,2.50,2.75,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,12.5,15.0,17.5,20.0,25.0,30.0]):
+    N=Nodes()
+    for b in betas:
+        N,F,lF=zdcpf(N,b=b)
+        N.save_nodes('Case_C_Beta_'+str(b))
+        save('./results/'+'Flows_Case_C_Beta_'+str(b),F)
+
+def Case_D(quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,0.99,1.0]):
+    N=Nodes()
+    for q in quants:
+        h0=get_quant(q)
+        N,F,lF=zdcpf(N,h0=h0)
+        N.save_nodes('Case_D_Quant_'+str(q))
+        save('./results/'+'Flows_Case_D_Quant_'+str(q),F)
+
+
 #tab=np.zeros((len(betas),2))
 #j=0
 #for b in betas:
@@ -407,11 +431,13 @@ def zdcpf(N,admat='admat.txt',path='./settings/',coop=0,copper=0,lapse=None,b=No
 #	print '               ',round(h0[2*i+1])  ,'     ',h[2*i+1] ,'         ', round(h[2*i+1]/h0[2*i+1],2)
 #
 N=Nodes()
+hopt=get_quant(.99)
 h0=get_quant(.99)
-betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90]
-for b in betas:
-    N,F,lF=zdcpf(N,b=b,h0=h0)
-    N.save_nodes('Case_A_Beta_'+str(b))
-    save('./results/'+'Flows_Case_A_Beta_'+str(b),F)
-
-
+links=np.arange(1000.0,30000.1,1000.0)
+for l in links:
+    for h in range(len(hopt)):
+        h0[h]=l
+        if hopt[h]<l: h0[h]=hopt[h]
+    N,F,lF=zdcpf(N,h0=h0)
+    N.save_nodes('Case_B_Link_'+str(l))
+    save('./results/'+'Flows_Case_B_Link_'+str(l),F)
