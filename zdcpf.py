@@ -502,9 +502,9 @@ def Plot_D():
         PlotD[j,1]=c
         j+=1
     save('./results/PlotD',PlotD)
-    return PlotB
+    return PlotD
 
-plotd=Plot_D()
+
 plota=load('./results/PlotA.npy')
 plotb=load('./results/PlotB.npy')
 plotc=load('./results/PlotC.npy')
