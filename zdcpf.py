@@ -414,7 +414,7 @@ def biggestpair(H):
     return H0
 
 def Plot_A():
-    betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90]
+    betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,1.0,1.1,1.2,1.3,1.4,1.5,2.0,3.0,4.0,5.0]
     N=Nodes()
     K,Hac,lF=AtoKh(N)
     Hact=biggestpair(Hac)
@@ -437,7 +437,7 @@ def Plot_A():
     return PlotA
 
 def Plot_B():
-    links=np.arange(1000.0,15000.1,1000.0)
+    links=np.arange(1000.0,30000.1,1000.0)
     N=Nodes()
     K,Hac,lF=AtoKh(N)
     Hact=biggestpair(Hac)
@@ -482,7 +482,7 @@ def Plot_C():
     return PlotC
 
 def Plot_D():
-    quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,0.99]
+    quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99]
     N=Nodes()
     K,Hac,lF=AtoKh(N)
     Hact=biggestpair(Hac)
@@ -504,10 +504,15 @@ def Plot_D():
     save('./results/PlotD',PlotD)
     return PlotD
 
-Case_A(betas=[1.4,1.5,2.0,3.0,4.0,5.0])
-Case_D(quants=[0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,1.0])
-Case_B(links=np.arange(16000.0,30000.1,1000.0))
-#plotd=Plot_D()
+
+#Case_A(betas=[1.4,1.5,2.0,3.0,4.0,5.0])
+#Case_D(quants=[0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,1.0])
+#Case_B(links=np.arange(16000.0,30000.1,1000.0))
+Plot_A()
+Plot_B()
+Plot_C()
+Plot_D()
+
 #plota=load('./results/PlotA.npy')
 #plotb=load('./results/PlotB.npy')
 #plotc=load('./results/PlotC.npy')
