@@ -508,29 +508,25 @@ def Plot_D():
 #Case_A(betas=[1.4,1.5,2.0,3.0,4.0,5.0])
 #Case_D(quants=[0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,1.0])
 #Case_B(links=np.arange(16000.0,30000.1,1000.0))
-Plot_A()
-Plot_B()
-Plot_C()
-Plot_D()
+#Plot_A()
+#Plot_B()
+#Plot_C()
+#Plot_D()
 
-#plota=load('./results/PlotA.npy')
-#plotb=load('./results/PlotB.npy')
-#plotc=load('./results/PlotC.npy')
-#plotd=load('./results/PlotD.npy')
+plota=load('./results/PlotA.npy')
+plotb=load('./results/PlotB.npy')
+plotc=load('./results/PlotC.npy')
+plotd=load('./results/PlotD.npy')
 
-#ax=subplot(1,1,1)
-#p1,=ax.plot(plota[:,0],plota[:,1],label='case A')
-#p2,=ax.plot(plotb[:,0],plotb[:,1],label='case B')
-#p3,=ax.plot(plotc[:,0],plotc[:,1],label='case C')
-#p4,=ax.plot(plotd[:,0],plotd[:,1],label='case D')
-#handles,labels=ax.get_legend_handles_labels()
-#ax.legend(handles,labels)
-#show()
+ax=subplot(1,1,1)
+p1,=ax.plot(plota[:,0],plota[:,1],label='case A')
+p2,=ax.plot(plotb[:,0],plotb[:,1],label='case B')
+p3,=ax.plot(plotc[:,0],plotc[:,1],label='case C')
+p4,=ax.plot(plotd[:,0],plotd[:,1],label='case D')
+handles,labels=ax.get_legend_handles_labels()
+ax.legend(handles,labels)
+show()
 
-
-
-
->>>>>>> 84b8abcd8f149b8d744f6027825a5449a646af18
 #N=Nodes()
 #K,H,lF=AtoKh(N)
 #h=H[2:88]
