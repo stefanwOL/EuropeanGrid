@@ -32,7 +32,8 @@ class node:
         self.colored_import = None #Set using self.set_colored_i_import()
         data.close()
         self._update_()
-    
+        self.gen=np.zeros(self.nhours)        
+
     def _update_(self):
         self.mismatch=(self.get_wind()+self.get_solar())-self.load
     
@@ -42,8 +43,9 @@ class node:
         
     def get_export(self):	
         """Returns export power time series in units of MW."""
-        return get_positive(self.mismatch) - self.curtailment + get_positive(self.balancing - get_positive(-self.mismatch))
-	
+        #return get_positive(self.mismatch) - self.curtailment + get_positive(self.balancing - get_positive(-self.mismatch))
+        return get_positive(self.mismatch) - self.curtailment	    
+
     def get_localRES(self):
         """Returns the local use of RES power time series in units of MW."""
         return self.get_wind() + self.get_solar() - self.curtailment  - self.get_export()
@@ -140,13 +142,13 @@ class Nodes:
 
         npzobj = load(path+load_filename)
         
-#        for attribute in npzobj.files:
-#            for i in arange(len(self)):
-#                print self.cache[i],attribute,npzobj[attribute][i]
-#                setattr(self.cache[i],attribute,npzobj[attribute][i])
+        for attribute in npzobj.files:
+            for i in arange(len(self)):
+                print self.cache[i],attribute,npzobj[attribute][i]
+                setattr(self.cache[i],attribute,npzobj[attribute][i])
 
-        for i in arange(len(self)):
-            setattr(self.cache[i],'balancing',npzobj['balancing'][i])
+#        for i in arange(len(self)):
+#            setattr(self.cache[i],'balancing',npzobj['balancing'][i])
 
         npzobj.close()
 
@@ -356,6 +358,18 @@ def get_quant(quant=0.99,filename='results/copper_flows.npy'):
                 break 
     return hs
 
+def show_hist(link,filename='results/copper_flows.npy',e=1,b=500):
+    f=np.load(filename)
+    flows=[]
+    for i in f:
+        flows.append(i)
+#        flows.append(i*(i>e))
+#        flows.append(i*(i<-e))
+#    a=hist(flows[link],bins=b,range=[0.1,flows[link].max()],normed=1,histtype='stepfilled')
+#    b=hist(flows[link+1],bins=b,range=[flows[link+1].min(),-0.1],normed=1,histtype='stepfilled')
+    a=hist(flows[link],bins=b,normed=1,histtype='stepfilled')
+    show()
+
 def zdcpf(N,admat='admat.txt',path='./settings/',coop=0,copper=0,lapse=None,b=None,h0=None):
     if lapse == None:
         lapse=N[0].nhours
@@ -373,6 +387,7 @@ def zdcpf(N,admat='admat.txt',path='./settings/',coop=0,copper=0,lapse=None,b=No
 
 ##
 def Case_A(betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90]):
+    '''Applying a fraction b of the 99Q optimal'''    
     N=Nodes()
     h0=get_quant(.99)
     for b in betas:
@@ -381,6 +396,7 @@ def Case_A(betas=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.
         save('./results/'+'Flows_Case_A_Beta_'+str(b),F)
 
 def Case_B(links=np.arange(1000.0,15000.1,1000.0)):
+    ''' Icreasing capacity in each link evenly -- until link reaches 99Q optimal '''
     N=Nodes()
     hopt=get_quant(.99)
     h0=get_quant(.99)
@@ -393,6 +409,7 @@ def Case_B(links=np.arange(1000.0,15000.1,1000.0)):
         save('./results/'+'Flows_Case_B_Link_'+str(l),F)
 
 def Case_C(betas=[1e-7,0.25,0.5,0.75,1.0,1.10,1.20,1.30,1.40,1.50,1.60,1.70,1.80,1.90,2.0,2.25,2.50,2.75,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,12.5,15.0,17.5,20.0,25.0,30.0]):
+    '''Implements on each link a factor b of its actual capacity'''    
     N=Nodes()
     for b in betas:
         N,F,lF=zdcpf(N,b=b)
@@ -400,6 +417,7 @@ def Case_C(betas=[1e-7,0.25,0.5,0.75,1.0,1.10,1.20,1.30,1.40,1.50,1.60,1.70,1.80
         save('./results/'+'Flows_Case_C_Beta_'+str(b),F)
 
 def Case_D(quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.90,0.99]):
+    '''Gives to each link a q Quantile of its copper plate optimum'''    
     N=Nodes()
     for q in quants:
         h0=get_quant(q)
@@ -482,7 +500,7 @@ def Plot_C():
     return PlotC
 
 def Plot_D():
-    quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99]
+    quants=[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.20,0.25,0.3,0.35,0.40,0.45,0.5,0.75,0.85,0.9,0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,0.99,0.9999]
     N=Nodes()
     K,Hac,lF=AtoKh(N)
     Hact=biggestpair(Hac)
@@ -504,6 +522,24 @@ def Plot_D():
     save('./results/PlotD',PlotD)
     return PlotD
 
+#h99=get_quant()
+#hopt=get_quant(0.9999999)
+#N=Nodes()
+#K,h1,L=AtoKh(N)
+#ha=h1[2:88]
+
+#N=Nodes(load_filename="Case_A_Beta_0.4.npz")
+#K,h2,L=AtoKh(N)
+#hdob=h99*.4
+
+#for i in range(size(L,0)):
+#    print L[i][0]+' & '+str(round(hopt[2*i]/1000,2)) +' & ' +str(round(h99[2*i]/1000,2)) +' & '+ str(round(hdob[2*i]/1000,2)) + ' & ' +str(round(ha[2*i]/1000,2)) +' \\\\'
+#    print '$\\blacktriangleleft$--- & '+ str(round(hopt[2*i+1]/1000,2)) +' & ' +str(round(h99[2*i+1]/1000,2)) +' & ' + str(round(hdob[2*i+1]/1000,2)) + ' & ' + str(round(ha[2*i+1]/1000,2)) +' \\\\'
+#ha[82]=0
+#print 'total capacity  ' + str(round(sum(biggestpair(hopt))/1000,2)) + ' & ' + str(round(sum(biggestpair(h99))/1000,2)) + ' & ' + str(round(sum(biggestpair(hdob))/1000,2)) + ' & ' + str(round(sum(biggestpair(ha))/1000,2)) 
+
+
+
 
 #Case_A(betas=[1.4,1.5,2.0,3.0,4.0,5.0])
 #Case_D(quants=[0.91,0.92,0.93,0.94,0.95,0.96,0.97,0.98,1.0])
@@ -513,19 +549,27 @@ def Plot_D():
 #Plot_C()
 #Plot_D()
 
-plota=load('./results/PlotA.npy')
-plotb=load('./results/PlotB.npy')
-plotc=load('./results/PlotC.npy')
-plotd=load('./results/PlotD.npy')
-
-ax=subplot(1,1,1)
-p1,=ax.plot(plota[:,0],plota[:,1],label='case A')
-p2,=ax.plot(plotb[:,0],plotb[:,1],label='case B')
-p3,=ax.plot(plotc[:,0],plotc[:,1],label='case C')
-p4,=ax.plot(plotd[:,0],plotd[:,1],label='case D')
-handles,labels=ax.get_legend_handles_labels()
-ax.legend(handles,labels)
-show()
+#plota=load('./results/PlotA.npy')
+#plotb=load('./results/PlotB.npy')
+#plotc=load('./results/PlotC.npy')
+#plotd=load('./results/PlotD.npy')
+#a=plota[-9:]
+#plote=concatenate((plotd,a),axis=0)
+#ax=subplot(1,1,1)
+#p1,=ax.plot(plota[:,0],plota[:,1],label='Case A')
+#p2,=ax.plot(plotb[:,0],plotb[:,1],label='Case B')
+#p3,=ax.plot(plotc[:,0],plotc[:,1],label='Current Development',color='r')
+#p4,=ax.plot(plote[:,0],plote[:,1],label='Ideal Case',color='b')
+#handles,labels=ax.get_legend_handles_labels()
+#ax.legend(handles,labels)
+#axhline(y=min(plota[:,1]),color='r',ls='--')
+#axvline(x=1,color='b',ls='--')
+#axvline(x=2.15,color='b',ls='--')
+#axvline(x=5.39,color='b',ls='--')
+#axvline(x=11.33,color='b',ls='--')
+#ylim( (0,.35) )
+#xlim( (0,12) )
+#show()
 
 #N=Nodes()
 #K,H,lF=AtoKh(N)
